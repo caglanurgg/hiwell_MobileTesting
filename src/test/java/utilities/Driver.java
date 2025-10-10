@@ -5,6 +5,7 @@ import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSElement;
 import io.appium.java_client.remote.MobileCapabilityType;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.MalformedURLException;
@@ -16,7 +17,7 @@ public class Driver {
     private static IOSDriver<IOSElement> iosDriver;
 
     static final String UDID="emulator-5554";
-    static final String ANDROIDVERSION="12";
+    static final String ANDROIDVERSION="12.0";
     static final String PLATFORM="Android";
     static final String OTOMASYON_ISMI="UiAutomator2";
 
@@ -70,4 +71,6 @@ public class Driver {
             appiumDriver = null;
         }
     }
+
+
 }
