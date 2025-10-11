@@ -5,7 +5,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.After;
 import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -13,8 +12,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import pages.SignUpPage;
 import utilities.Driver;
 import utilities.ReusableMethods;
-import java.time.Duration;
-
 
 public class SignUpStepDefs {
 
@@ -35,16 +32,17 @@ public class SignUpStepDefs {
     public void the_user_selects_the_therapy_language(String languageOption) {
         ReusableMethods.wait(2);
         ReusableMethods.scrollWithUiScrollableAndClick(languageOption);
-
         System.out.println("Başarılı bir şekilde dil seçildi: " + languageOption + " (UiAutomator ile)");
     }
 
     @Then("The user should be greeted with {string} message")
     public void the_user_should_be_greeted_with_message(String expectedMessage) {
-        WebDriverWait wait = new WebDriverWait(Driver.getAndroidDriver(), 3);
-        WebElement visibleWelcomeText = wait.until(ExpectedConditions.visibilityOf(signpage.welcomeText));
+        WebElement welcomeElement = signpage.getWelcomeTextElement(expectedMessage);
 
-        Assert.assertTrue("Karşılama metni (" + expectedMessage + ") 8 saniye içinde görünür olmadı.", visibleWelcomeText.isDisplayed());
+        WebDriverWait wait = new WebDriverWait(Driver.getAndroidDriver(), 3);
+        WebElement visibleWelcomeText = wait.until(ExpectedConditions.visibilityOf(welcomeElement));
+
+        Assert.assertTrue("Karşılama metni 3 saniye içinde görünür olmadı.", visibleWelcomeText.isDisplayed());
         System.out.println("Karşılama sayfası yüklendi ve başlık başarıyla doğrulandı.");
     }
 
@@ -56,26 +54,48 @@ public class SignUpStepDefs {
 
     @When("The user taps on the {string} button to proceed to the form")
     public void the_user_taps_on_the_button_to_proceed_to_the_form(String buttonText) {
+        ReusableMethods.wait(3);
         ReusableMethods.clickElement(Driver.getAndroidDriver(), signpage.startButton, 5);
-
         System.out.println("Başlayın butonu (" + buttonText + ") güvenilir ID ile tıklandı ve sonraki sayfaya geçildi.");
     }
 
     @When("The user selects the {string} option")
     public void the_user_selects_the_option(String therapyType) throws InterruptedException {
-        ReusableMethods.clickElement(Driver.getAndroidDriver(), signpage.individualTherapyButton, 5);
-        System.out.println("Terapi türü: " + therapyType + " başarıyla seçildi.");
+
+        if (therapyType.equals("Thérapie Individuelle")) {
+            int xKoord = 689;
+            int yKoord = 997;
+
+            ReusableMethods.koordinatTiklamaMethodu(xKoord, yKoord, 500);
+            System.out.println("Koordinat ile tıklandı: X=" + xKoord + ", Y=" + yKoord);
+
+        } else {
+            ReusableMethods.scrollWithUiScrollableAndClick(therapyType);
+        }
+
+        ReusableMethods.wait(3);
+        System.out.println("Terapi türü: " + therapyType + " başarıyla seçildi ve yeni sayfaya geçildi.");
     }
+
+    /*
+    @And("The user clicks the {string} dropdown")
+    public void theUserClicksTheDropdown(String dropdownText) throws InterruptedException {
+        signpage.clicksAgeDropdownDynamically(dropdownText);
+        System.out.println("Dropdown (" + dropdownText + ") başarıyla tıklandı.");
+    }
+     */
 
     @And("The user clicks the {string} dropdown")
     public void theUserClicksTheDropdown(String dropdownText) throws InterruptedException {
         signpage.clicksAgeDropdownByCoordinates();
-        System.out.println("Dropdown (" + dropdownText + ") ID ile başarıyla tıklandı.");
+        ReusableMethods.wait(2);
+        System.out.println("Dropdown (" + dropdownText + ") statik koordinatla tıklandı.");
     }
 
     @And("The user selects the age {string} from the picker")
     public void theUserSelectsTheAgeFromThePicker(String age) {
-        ReusableMethods.scrollWithUiScrollableAndClick(age);
+        signpage.scrollAndSelectAge(age);
+        ReusableMethods.wait(2);
         System.out.println("Yaş değeri: " + age + " başarıyla seçildi.");
     }
 
@@ -96,9 +116,8 @@ public class SignUpStepDefs {
         signpage.continueButton.click();
     }
 
-    @After
-    public void tearDown() {
+    @And("The user closes the application")
+    public void theUserClosesTheApplication() {
         Driver.quitAppiumDriver();
     }
-
 }

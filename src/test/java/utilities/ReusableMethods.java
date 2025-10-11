@@ -32,12 +32,6 @@ public class ReusableMethods {
                 .perform();
     }
 
-    public static void scrollWithUiScrollableAndClick(String elementText) {
-        AndroidDriver driver = (AndroidDriver)  Driver.getAndroidDriver();
-        driver.findElementByAndroidUIAutomator("new UiScrollable(new UiSelector()).scrollIntoView(text(\"" + elementText + "\"))");
-        driver.findElementByXPath("//*[@text='" + elementText + "']").click();
-    }
-
     public static void scrollWithUiScrollable(String elementText){
         AndroidDriver driver = (AndroidDriver)  Driver.getAndroidDriver();
         driver.findElementByAndroidUIAutomator("new UiScrollable(new UiSelector()).scrollIntoView(text(\"" + elementText + "\"))");
@@ -85,6 +79,31 @@ public class ReusableMethods {
         WebDriverWait wait = new WebDriverWait(BrowserDriver.getBrowserDriver(), timeout);
         return wait.until(ExpectedConditions.visibilityOf(element));
         }
+
+    public static void scrollWithUiScrollableAndClick(String elementText) {
+        AndroidDriver driver = (AndroidDriver) Driver.getAndroidDriver();
+
+        String uiAutomatorScrollCommand = "new UiScrollable(new UiSelector()).scrollIntoView(new UiSelector().textContains(\"" + elementText + "\"))";
+
+        try {
+            driver.findElementByAndroidUIAutomator(uiAutomatorScrollCommand);
+            wait(1);
+
+            String xpathClick = "//*[contains(@text,'" + elementText + "')]";
+            WebElement targetElement = driver.findElementByXPath(xpathClick);
+
+            int elementCenterX = targetElement.getLocation().getX() + (targetElement.getSize().getWidth() / 2);
+            int elementCenterY = targetElement.getLocation().getY() + (targetElement.getSize().getHeight() / 2);
+
+            koordinatTiklamaMethodu(elementCenterX, elementCenterY, 500);
+
+            System.out.println("Başarıyla seçildi: " + elementText);
+
+        } catch (Exception e) {
+            System.err.println("HATA: Güvenli Seçim Başarısız: " + elementText);
+            throw new RuntimeException("Terapi türü seçimi başarısız: " + elementText + ", Hata: " + e.getMessage(), e);
+        }
+    }
     }
 
 
