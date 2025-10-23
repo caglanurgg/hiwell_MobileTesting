@@ -1,4 +1,4 @@
-@hiwell
+
 Feature: Therapy area selection during sign-up on Hiwell mobile application
 
   Description: This feature validates that a new user can successfully sign up,

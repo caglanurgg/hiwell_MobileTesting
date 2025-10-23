@@ -43,6 +43,13 @@ public class SignUpPage {
             return new String[]{"Kaygı ve endişe", "Kötü alışkanlıklar", "Stres"};
     }
 
+    public String[] getSelectedTherapistPreferences() {
+        if (selectedLanguage.equals("Français"))
+            return new String[]{"M’écouter avant tout", "Faire des activités et les devoirs"};
+        else
+            return new String[]{"Düşünce ve görüşlerimi sorgulatan", "Davranış örüntülerimi keşfettiren"};
+    }
+
     public WebElement getConfirmationElement() {
         return Driver.getAndroidDriver().findElement(By.id("com.hiwell:id/therapistMatchText"));
     }
@@ -114,13 +121,28 @@ public class SignUpPage {
         return Driver.getAndroidDriver().findElementByXPath(xpath);
     }
 
-    public void clickMentalHealthCardByCoordinates() throws InterruptedException {
-        int xkoordinati = 582;
-        int ykoordinati = 1431;
-        int beklemeSuresi = 600;
+    public void selectTherapyArea(String therapyArea) throws InterruptedException {
+        AndroidDriver driver = Driver.getAndroidDriver();
 
-        System.out.println("Koordinat ile tıklanıyor: X=" + xkoordinati + ", Y=" + ykoordinati);
-        koordinatTiklamaMethodu(xkoordinati, ykoordinati, beklemeSuresi);
+        String uiAutomatorCommand = "new UiScrollable(new UiSelector().scrollable(true))" +
+                ".scrollIntoView(new UiSelector().text(\"" + therapyArea + "\").instance(0))";
+
+        try {
+            WebElement therapyCard = driver.findElementByAndroidUIAutomator(uiAutomatorCommand);
+            ReusableMethods.wait(1);
+
+            // Element bulunduktan sonra merkez koordinatlarını hesaplayıp tıklıyoruz (Stabilite)
+            int elementCenterX = therapyCard.getLocation().getX() + (therapyCard.getSize().getWidth() / 2);
+            int elementCenterY = therapyCard.getLocation().getY() + (therapyCard.getSize().getHeight() / 2);
+
+            koordinatTiklamaMethodu(elementCenterX, elementCenterY, 500);
+
+            System.out.println("Terapi alanı: " + therapyArea + " başarıyla bulundu ve tıklandı.");
+
+        } catch (Exception e) {
+            System.err.println("HATA: Terapi Alanı Seçimi Başarısız: " + therapyArea);
+            throw new RuntimeException("Terapi alanı seçilemedi: " + therapyArea, e);
+        }
     }
 
     public void clickNutritionandDietByCoordinates() throws InterruptedException {
@@ -258,6 +280,40 @@ public class SignUpPage {
 
         selectProblemSafely(problemThree);
         ReusableMethods.wait(1);
+    }
+
+    public void selectTherapistPreferenceDynamically(String preferenceText) {
+        AndroidDriver driver = Driver.getAndroidDriver();
+
+        String xpath = String.format("//android.widget.TextView[@resource-id='com.hiwell:id/choiceItemText' and @text='%s']", preferenceText);
+
+        try {
+            String uiScrollableCommand = "new UiScrollable(new UiSelector().scrollable(true))" +
+                    ".scrollIntoView(new UiSelector().text(\"" + preferenceText + "\").instance(0))";
+
+            driver.findElementByAndroidUIAutomator(uiScrollableCommand);
+
+            WebElement preferenceElement = driver.findElementByXPath(xpath);
+            ReusableMethods.wait(1);
+
+            int elementCenterX = preferenceElement.getLocation().getX() + (preferenceElement.getSize().getWidth() / 2);
+            int elementCenterY = preferenceElement.getLocation().getY() + (preferenceElement.getSize().getHeight() / 2);
+
+            ReusableMethods.koordinatTiklamaMethodu(elementCenterX, elementCenterY, 500);
+
+            System.out.println("Başarıyla seçildi (Dinamik XPath): " + preferenceText);
+
+        } catch (Exception e) {
+            System.err.println("HATA: Dinamik Terapist Tercihi Seçimi Başarısız: " + preferenceText + " | XPath: " + xpath);
+            throw new RuntimeException("Terapist tercihi seçimi başarısız: " + preferenceText, e);
+        }
+    }
+
+    public void selectTherapistPreferencesAndContinue(String... preferenceTexts) {
+        for (String preferenceText : preferenceTexts) {
+            selectTherapistPreferenceDynamically(preferenceText);
+            ReusableMethods.wait(1);
+        }
     }
 }
 

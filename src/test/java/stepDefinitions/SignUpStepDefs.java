@@ -48,7 +48,7 @@ public class SignUpStepDefs {
 
     @When("The user chooses the {string} therapy area")
     public void the_user_chooses_the_therapy_area(String therapyArea) throws InterruptedException {
-        signpage.clickMentalHealthCardByCoordinates();
+        signpage.selectTherapyArea(therapyArea);
         System.out.println("Terapi alanı: " + therapyArea + " seçildi.");
     }
 
@@ -59,6 +59,7 @@ public class SignUpStepDefs {
         System.out.println("Başlayın butonu (" + buttonText + ") güvenilir ID ile tıklandı ve sonraki sayfaya geçildi.");
     }
 
+    /*
     @When("The user selects the {string} option")
     public void the_user_selects_the_option(String therapyType) throws InterruptedException {
 
@@ -76,14 +77,16 @@ public class SignUpStepDefs {
         ReusableMethods.wait(3);
         System.out.println("Terapi türü: " + therapyType + " başarıyla seçildi ve yeni sayfaya geçildi.");
     }
-
-    /*
-    @And("The user clicks the {string} dropdown")
-    public void theUserClicksTheDropdown(String dropdownText) throws InterruptedException {
-        signpage.clicksAgeDropdownDynamically(dropdownText);
-        System.out.println("Dropdown (" + dropdownText + ") başarıyla tıklandı.");
-    }
      */
+
+    @And("The user selects the {string} option")
+    public void the_user_selects_the_option(String therapyType) throws InterruptedException {
+        ReusableMethods.scrollWithUiScrollableAndClick(therapyType);
+        signpage.setSelectedTherapyType(therapyType);
+
+        ReusableMethods.wait(3);
+        System.out.println("Terapi türü: " + therapyType + " başarıyla seçildi ve yeni sayfaya geçildi.");
+    }
 
     @And("The user clicks the {string} dropdown")
     public void theUserClicksTheDropdown(String dropdownText) throws InterruptedException {
@@ -129,13 +132,11 @@ public class SignUpStepDefs {
         signpage.setSelectedLanguage(language);
 
         System.out.println("Dil başarıyla seçildi: " + language);
+        ReusableMethods.wait(2);
     }
 
     @When("The user proceeds through the form and completes the sign-up")
     public void the_user_proceeds_through_the_form_and_completes_the_sign_up()  throws InterruptedException {
-
-        String therapyType = signpage.getSelectedTherapyType();
-        the_user_selects_the_option(therapyType);
 
         theUserClicksTheDropdown(signpage.getAgeDropdownText());
         theUserSelectsTheAgeFromThePicker("27");
@@ -146,6 +147,10 @@ public class SignUpStepDefs {
 
         String[] problems = signpage.getSelectedProblems();
         theUserSelectsTheProblem(problems[0], problems[1], problems[2]);
+
+        String[] preferences = signpage.getSelectedTherapistPreferences();
+        signpage.selectTherapistPreferencesAndContinue(preferences);
+        ReusableMethods.wait(3);
 
         theUserClicksTheButton("Devam Edin");
     }
