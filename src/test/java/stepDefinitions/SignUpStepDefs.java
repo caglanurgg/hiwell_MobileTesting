@@ -120,4 +120,40 @@ public class SignUpStepDefs {
     public void theUserClosesTheApplication() {
         Driver.quitAppiumDriver();
     }
+
+    @And("The user selects the {string} language")
+    public void theUserSelectsTheLanguage(String language) {
+        ReusableMethods.wait(2);
+        ReusableMethods.scrollWithUiScrollableAndClick(language);
+
+        signpage.setSelectedLanguage(language);
+
+        System.out.println("Dil başarıyla seçildi: " + language);
+    }
+
+    @When("The user proceeds through the form and completes the sign-up")
+    public void the_user_proceeds_through_the_form_and_completes_the_sign_up()  throws InterruptedException {
+
+        String therapyType = signpage.getSelectedTherapyType();
+        the_user_selects_the_option(therapyType);
+
+        theUserClicksTheDropdown(signpage.getAgeDropdownText());
+        theUserSelectsTheAgeFromThePicker("27");
+        theUserConfirmsTheSelectionByTappingTheButton("TAMAM");
+
+        String gender = signpage.getSelectedGender();
+        ReusableMethods.scrollWithUiScrollableAndClick(gender);
+
+        String[] problems = signpage.getSelectedProblems();
+        theUserSelectsTheProblem(problems[0], problems[1], problems[2]);
+
+        theUserClicksTheButton("Devam Edin");
+    }
+
+    @Then("The user should see the {string} confirmation")
+    public void the_user_should_see_the_confirmation(String expectedText) {
+        WebElement confirmation = signpage.getConfirmationElement();
+        Assert.assertTrue(confirmation.isDisplayed());
+        System.out.println("Therapist Match confirmation görüntülendi: " + expectedText);
+    }
 }

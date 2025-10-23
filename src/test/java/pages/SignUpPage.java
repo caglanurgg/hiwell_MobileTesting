@@ -17,6 +17,49 @@ public class SignUpPage {
         PageFactory.initElements(new AppiumFieldDecorator(Driver.getAndroidDriver()),this);
     }
 
+    private String selectedLanguage;
+
+    public void setSelectedLanguage(String language) {
+        this.selectedLanguage = language;
+    }
+
+    public String getSelectedLanguage() {
+        return this.selectedLanguage;
+    }
+
+    public String getAgeDropdownText() {
+        return selectedLanguage.equals("Français") ? "Votre âge" : "Yaşınız";
+    }
+
+    public String getSelectedGender() {
+        if(selectedLanguage.equals("Français")) return "Femme";
+        else return "Kadın";
+    }
+
+    public String[] getSelectedProblems() {
+        if(selectedLanguage.equals("Français"))
+            return new String[]{"Anxiété et inquiétude", "Mauvaises habitudes", "Stress"};
+        else
+            return new String[]{"Kaygı ve endişe", "Kötü alışkanlıklar", "Stres"};
+    }
+
+    public WebElement getConfirmationElement() {
+        return Driver.getAndroidDriver().findElement(By.id("com.hiwell:id/therapistMatchText"));
+    }
+
+    private String selectedTherapyType;
+
+    public void setSelectedTherapyType(String therapyType) {
+        this.selectedTherapyType = therapyType;
+    }
+
+    public String getSelectedTherapyType() {
+        if (selectedTherapyType == null) {
+            throw new RuntimeException("Therapy type henüz set edilmedi!");
+        }
+        return selectedTherapyType;
+    }
+
     @FindBy(id = "com.hiwell:id/greetingsRegisterButton")
     public WebElement signUpButton;
 
