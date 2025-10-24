@@ -19,7 +19,7 @@ Feature: Sign Up - Therapy Service
     When The user taps on the 'Sign Up' button
     And The user selects the "Français" language
     And The user taps on the "Commencer" button to proceed to the form
-    And The user chooses the "Thérapie Individuelle" therapy type
+    And The user selects the "Thérapie Individuelle" option
     When The user proceeds through the form and completes the sign-up
     Then The user should see the "Therapist Match" confirmation
 

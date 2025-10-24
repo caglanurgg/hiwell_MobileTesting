@@ -79,9 +79,6 @@ public class SignUpPage {
     @FindBy(id = "com.hiwell:id/changeLanguageTextView2")
     public WebElement selectYourLanguage;
 
-    @FindBy(xpath = "//*[@text='Türkçe']")
-    public WebElement turkceText;
-
     @FindBy(id = "com.hiwell:id/startTestButton")
     public WebElement startButton;
 
@@ -131,7 +128,6 @@ public class SignUpPage {
             WebElement therapyCard = driver.findElementByAndroidUIAutomator(uiAutomatorCommand);
             ReusableMethods.wait(1);
 
-            // Element bulunduktan sonra merkez koordinatlarını hesaplayıp tıklıyoruz (Stabilite)
             int elementCenterX = therapyCard.getLocation().getX() + (therapyCard.getSize().getWidth() / 2);
             int elementCenterY = therapyCard.getLocation().getY() + (therapyCard.getSize().getHeight() / 2);
 
@@ -143,50 +139,6 @@ public class SignUpPage {
             System.err.println("HATA: Terapi Alanı Seçimi Başarısız: " + therapyArea);
             throw new RuntimeException("Terapi alanı seçilemedi: " + therapyArea, e);
         }
-    }
-
-    public void clickNutritionandDietByCoordinates() throws InterruptedException {
-        int xkoordinati = 588;
-        int ykoordinati = 2066;
-        int beklemeSuresi = 500;
-
-        System.out.println("Koordinat ile tıklanıyor: X=" + xkoordinati + ", Y=" + ykoordinati);
-
-        koordinatTiklamaMethodu(xkoordinati, ykoordinati, beklemeSuresi);
-    }
-
-    public void clickStartButtonByCoordinates() throws InterruptedException {
-        int xkoordinati = 712;
-        int ykoordinati = 2671;
-        int beklemeSuresi = 700;
-
-        System.out.println("Koordinat ile tıklanıyor: X=" + xkoordinati + ", Y=" + ykoordinati);
-
-        koordinatTiklamaMethodu(xkoordinati, ykoordinati, beklemeSuresi);
-        ReusableMethods.wait(5);
-        System.out.println("Başlayın butonu tıklandı ve sayfa yüklemesi için sabit süre beklendi.");
-    }
-
-    public void chooseIndividualTherapyByCoordinates() throws InterruptedException {
-        int xkoordinati = 706;
-        int ykoordinati = 1015;
-        int beklemeSuresi = 700;
-
-        System.out.println("Koordinat ile tıklanıyor: X=" + xkoordinati + ", Y=" + ykoordinati);
-
-        koordinatTiklamaMethodu(xkoordinati, ykoordinati, beklemeSuresi);
-    }
-
-    public void clicksAgeDropdownByCoordinates() throws InterruptedException {
-        int xkoordinati = 695;
-        int ykoordinati = 985;
-        int beklemeSuresi = 500;
-
-        ReusableMethods.wait(2);
-
-        System.out.println("Koordinat ile tıklanıyor: X=" + xkoordinati + ", Y=" + ykoordinati);
-
-        ReusableMethods.koordinatTiklamaMethodu(xkoordinati, ykoordinati, beklemeSuresi);
     }
 
     public void clicksAgeDropdownDynamically(String dropdownText) throws InterruptedException {
@@ -209,7 +161,7 @@ public class SignUpPage {
         }
     }
 
-    public void scrollAndSelectAge(String targetAge) {
+    public void scrollAndSelectAgeDynamically(String targetAge) {
         AndroidDriver driver = Driver.getAndroidDriver();
 
         String uiScrollable = "new UiScrollable(new UiSelector().scrollable(true))";
@@ -218,34 +170,35 @@ public class SignUpPage {
         try {
             WebElement ageElement = driver.findElementByAndroidUIAutomator(uiAutomatorCommand);
             ReusableMethods.wait(1);
-            ageElement.click();
+
+            int elementCenterX = ageElement.getLocation().getX() + (ageElement.getSize().getWidth() / 2);
+            int elementCenterY = ageElement.getLocation().getY() + (ageElement.getSize().getHeight() / 2);
+
+            koordinatTiklamaMethodu(elementCenterX, elementCenterY, 500);
+
+            System.out.println("Yaş değeri: " + targetAge + " başarıyla seçildi.");
         } catch (Exception e) {
             System.err.println("Yaş seçicide " + targetAge + " bulunamadı veya tıklanamadı: " + e.getMessage());
-            try {
-                clickPickerCenterByCoordinates();
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
+            throw new RuntimeException("Yaş seçilemedi: " + targetAge, e);
         }
     }
 
-    public void clickPickerCenterByCoordinates() throws InterruptedException {
-        int xkoordinati = 712;
-        int ykoordinati = 1383;
-        int beklemeSuresi = 500;
+    public void clicksOkButtonDynamically(String buttonText) throws InterruptedException {
+        AndroidDriver driver = Driver.getAndroidDriver();
+        String xpath = "//*[@text='" + buttonText + "']";
 
-        System.out.println("Koordinat ile tıklanıyor (Picker Ortası): X=" + xkoordinati + ", Y=" + ykoordinati);
-        koordinatTiklamaMethodu(xkoordinati, ykoordinati, beklemeSuresi);
-    }
+        try {
+            WebElement okButton = driver.findElementByXPath(xpath);
 
-    public void clicksOkButtonByCoordinates() throws InterruptedException {
-        int xkoordinati = 1187;
-        int ykoordinati = 1793;
-        int beklemeSuresi = 500;
+            int elementCenterX = okButton.getLocation().getX() + (okButton.getSize().getWidth() / 2);
+            int elementCenterY = okButton.getLocation().getY() + (okButton.getSize().getHeight() / 2);
 
-        System.out.println("Koordinat ile tıklanıyor: X=" + xkoordinati + ", Y=" + ykoordinati);
+            koordinatTiklamaMethodu(elementCenterX, elementCenterY, 500);
 
-        koordinatTiklamaMethodu(xkoordinati, ykoordinati, beklemeSuresi);
+            System.out.println("Onay butonu (" + buttonText + ") dinamik olarak tıklandı.");
+        } catch (Exception e) {
+            throw new RuntimeException("Onay butonu bulunamadı: " + buttonText, e);
+        }
     }
 
     public static void selectProblemSafely(String problemText) {
@@ -282,6 +235,10 @@ public class SignUpPage {
         ReusableMethods.wait(1);
     }
 
+    public String getAgePickerOkButtonText() {
+        return selectedLanguage.equals("Français") ? "OK" : "TAMAM";
+    }
+
     public void selectTherapistPreferenceDynamically(String preferenceText) {
         AndroidDriver driver = Driver.getAndroidDriver();
 
@@ -313,6 +270,113 @@ public class SignUpPage {
         for (String preferenceText : preferenceTexts) {
             selectTherapistPreferenceDynamically(preferenceText);
             ReusableMethods.wait(1);
+        }
+    }
+
+    public String getPreviousTherapyStatus() {
+        if (selectedLanguage.equals("Français")) {
+            return "Oui";
+        } else {
+            return "Evet";
+        }
+    }
+
+    public void selectTherapyPastStatus(String statusText) {
+        Driver.getAndroidDriver().findElementByXPath("//*[@text='" + statusText + "']").click();
+        System.out.println("Terapist geçmişi seçildi: " + statusText);
+    }
+
+    public void clickContinueButtonDynamically(String buttonText) throws InterruptedException {
+        AndroidDriver driver = Driver.getAndroidDriver();
+
+        String xpath = String.format("//*[@text='%s']", buttonText);
+
+        try {
+            WebElement continueButton = driver.findElementByXPath(xpath);
+
+            int elementCenterX = continueButton.getLocation().getX() + (continueButton.getSize().getWidth() / 2);
+            int elementCenterY = continueButton.getLocation().getY() + (continueButton.getSize().getHeight() / 2);
+
+            koordinatTiklamaMethodu(elementCenterX, elementCenterY, 500);
+
+            System.out.println("Devam Edin butonu (" + buttonText + ") dinamik olarak tıklandı.");
+        } catch (Exception e) {
+            System.err.println("HATA: Devam Edin Butonu bulunamadı: " + buttonText);
+
+            throw new RuntimeException("Devam Edin butonu tıklanamadı: " + buttonText, e);
+        }
+    }
+
+    public String getSelectedTherapistGender() {
+        if (selectedLanguage.equals("Français")) {
+            return "Femme";
+        } else {
+            return "Kadın";
+        }
+    }
+
+    public void selectTherapistGenderDynamically(String genderText) {
+        AndroidDriver driver = Driver.getAndroidDriver();
+
+        String xpath = String.format("//*[@text='%s']", genderText);
+
+        try {
+            WebElement genderElement = driver.findElementByXPath(xpath);
+
+            int elementCenterX = genderElement.getLocation().getX() + (genderElement.getSize().getWidth() / 2);
+            int elementCenterY = genderElement.getLocation().getY() + (genderElement.getSize().getHeight() / 2);
+
+            koordinatTiklamaMethodu(elementCenterX, elementCenterY, 500);
+
+            System.out.println("Terapist Cinsiyeti başarıyla seçildi: " + genderText);
+
+        } catch (Exception e) {
+            System.err.println("HATA: Terapist Cinsiyeti bulunamadı: " + genderText);
+            throw new RuntimeException("Terapist Cinsiyeti seçimi başarısız: " + genderText, e);
+        }
+    }
+
+    public String[] getSelectedTimeSlots() {
+        if (selectedLanguage.equals("Français")) {
+            return new String[]{"En semaine - Matin", "En semaine - Après-midi"};
+        } else {
+            return new String[]{"Hafta İçi - Sabah (09:00 - 12:00)", "Hafta İçi - Öğle (12:00 - 16:00)"};
+        }
+    }
+
+    public void selectTimeSlotsAndContinue(String... timeSlots) throws InterruptedException {
+        AndroidDriver driver = Driver.getAndroidDriver();
+
+        for (String slot : timeSlots) {
+            String xpath = String.format("//*[@text='%s']", slot);
+            try {
+                WebElement slotElement = driver.findElementByXPath(xpath);
+                slotElement.click();
+                ReusableMethods.wait(3);
+            } catch (Exception e) {
+                throw new RuntimeException("Saat slotu bulunamadı: " + slot, e);
+            }
+        }
+        System.out.println(timeSlots.length + " adet saat slotu seçildi.");
+    }
+
+    public String getSelectedFinancialStatus() {
+        if (selectedLanguage.equals("Français")) {
+            return "Très bien";
+        } else {
+            return "İyi";
+        }
+    }
+
+    public void selectFinancialStatusDynamically(String statusText) {
+        AndroidDriver driver = Driver.getAndroidDriver();
+        String xpath = String.format("//*[@text='%s']", statusText);
+
+        try {
+            driver.findElementByXPath(xpath).click();
+            System.out.println("Ekonomik Durum başarıyla seçildi: " + statusText);
+        } catch (Exception e) {
+            throw new RuntimeException("Ekonomik Durum seçimi başarısız: " + statusText, e);
         }
     }
 }

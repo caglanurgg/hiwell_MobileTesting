@@ -54,30 +54,10 @@ public class SignUpStepDefs {
 
     @When("The user taps on the {string} button to proceed to the form")
     public void the_user_taps_on_the_button_to_proceed_to_the_form(String buttonText) {
-        ReusableMethods.wait(3);
-        ReusableMethods.clickElement(Driver.getAndroidDriver(), signpage.startButton, 5);
+        ReusableMethods.wait(5);
+        ReusableMethods.clickElement(Driver.getAndroidDriver(), signpage.startButton, 7);
         System.out.println("Başlayın butonu (" + buttonText + ") güvenilir ID ile tıklandı ve sonraki sayfaya geçildi.");
     }
-
-    /*
-    @When("The user selects the {string} option")
-    public void the_user_selects_the_option(String therapyType) throws InterruptedException {
-
-        if (therapyType.equals("Thérapie Individuelle")) {
-            int xKoord = 689;
-            int yKoord = 997;
-
-            ReusableMethods.koordinatTiklamaMethodu(xKoord, yKoord, 500);
-            System.out.println("Koordinat ile tıklandı: X=" + xKoord + ", Y=" + yKoord);
-
-        } else {
-            ReusableMethods.scrollWithUiScrollableAndClick(therapyType);
-        }
-
-        ReusableMethods.wait(3);
-        System.out.println("Terapi türü: " + therapyType + " başarıyla seçildi ve yeni sayfaya geçildi.");
-    }
-     */
 
     @And("The user selects the {string} option")
     public void the_user_selects_the_option(String therapyType) throws InterruptedException {
@@ -86,26 +66,6 @@ public class SignUpStepDefs {
 
         ReusableMethods.wait(3);
         System.out.println("Terapi türü: " + therapyType + " başarıyla seçildi ve yeni sayfaya geçildi.");
-    }
-
-    @And("The user clicks the {string} dropdown")
-    public void theUserClicksTheDropdown(String dropdownText) throws InterruptedException {
-        signpage.clicksAgeDropdownByCoordinates();
-        ReusableMethods.wait(2);
-        System.out.println("Dropdown (" + dropdownText + ") statik koordinatla tıklandı.");
-    }
-
-    @And("The user selects the age {string} from the picker")
-    public void theUserSelectsTheAgeFromThePicker(String age) {
-        signpage.scrollAndSelectAge(age);
-        ReusableMethods.wait(2);
-        System.out.println("Yaş değeri: " + age + " başarıyla seçildi.");
-    }
-
-    @And("The user confirms the selection by tapping the {string} button")
-    public void theUserConfirmsTheSelectionByTappingTheButton(String buttonText) throws InterruptedException {
-        signpage.clicksOkButtonByCoordinates();
-        System.out.println("Onay butonu (" + buttonText + ") koordinatla tıklandı.");
     }
 
     @And("The user selects the {string} {string} {string} problem")
@@ -137,22 +97,45 @@ public class SignUpStepDefs {
 
     @When("The user proceeds through the form and completes the sign-up")
     public void the_user_proceeds_through_the_form_and_completes_the_sign_up()  throws InterruptedException {
+        String continueButtonText = signpage.getSelectedLanguage().equals("Français") ? "Commencer" : "Devam Edin";
+        String okButtonText = signpage.getAgePickerOkButtonText();
 
-        theUserClicksTheDropdown(signpage.getAgeDropdownText());
-        theUserSelectsTheAgeFromThePicker("27");
-        theUserConfirmsTheSelectionByTappingTheButton("TAMAM");
+        signpage.clicksAgeDropdownDynamically(signpage.getAgeDropdownText());
+        ReusableMethods.wait(2);
+        signpage.scrollAndSelectAgeDynamically("26");
+        ReusableMethods.wait(1);
+        signpage.clicksOkButtonDynamically(okButtonText);
+        ReusableMethods.wait(2);
 
         String gender = signpage.getSelectedGender();
         ReusableMethods.scrollWithUiScrollableAndClick(gender);
 
         String[] problems = signpage.getSelectedProblems();
-        theUserSelectsTheProblem(problems[0], problems[1], problems[2]);
+        signpage.selectProblemsAndContinue(problems[0], problems[1], problems[2]);
+        theUserClicksTheButton(continueButtonText);
+        ReusableMethods.wait(2);
 
         String[] preferences = signpage.getSelectedTherapistPreferences();
         signpage.selectTherapistPreferencesAndContinue(preferences);
-        ReusableMethods.wait(3);
+        theUserClicksTheButton(continueButtonText);
+        ReusableMethods.wait(2);
 
-        theUserClicksTheButton("Devam Edin");
+        String therapistGender = signpage.getSelectedTherapistGender();
+        signpage.selectTherapistGenderDynamically(therapistGender);
+        ReusableMethods.wait(2);
+
+        String therapyPast = signpage.getPreviousTherapyStatus();
+        signpage.selectTherapyPastStatus(therapyPast);
+        ReusableMethods.wait(2);
+
+        String[] timeSlots = signpage.getSelectedTimeSlots();
+        signpage.selectTimeSlotsAndContinue(timeSlots);
+        theUserClicksTheButton(continueButtonText);
+        ReusableMethods.wait(2);
+
+        String financialStatus = signpage.getSelectedFinancialStatus();
+        signpage.selectFinancialStatusDynamically(financialStatus);
+        ReusableMethods.wait(2);
     }
 
     @Then("The user should see the {string} confirmation")
